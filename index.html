@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abubakr Mostafa | SOC Analyst</title>
+    <style>
+        /* --- CYBERPUNK THEME VARIABLES --- */
+        :root {
+            --bg-color: #050505;
+            --card-bg: rgba(20, 20, 20, 0.95);
+            --neon-green: #00ff41;
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --text-main: #e0e0e0;
+            --terminal-bg: rgba(10, 10, 10, 0.95);
+        }
+
+        /* --- GLOBAL RESET --- */
+        * { box-sizing: border-box; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; color: var(--neon-blue); transition: 0.3s; }
+        a:hover { color: var(--neon-pink); text-shadow: 0 0 8px var(--neon-pink); }
+
+        /* --- TERMINAL TOGGLE BUTTON --- */
+        #term-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: black;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 10px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+            transition: 0.3s;
+        }
+        #term-btn:hover {
+            background: var(--neon-green);
+            color: black;
+            box-shadow: 0 0 20px var(--neon-green);
+        }
+
+        /* --- TERMINAL OVERLAY --- */
+        #terminal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        #terminal-window {
+            width: 80%;
+            max-width: 900px;
+            height: 70%;
+            background: #0c0c0c;
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.15);
+            display: flex;
+            flex-direction: column;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        #term-header {
+            background: #1a1a1a;
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        #term-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            color: var(--neon-green);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1rem;
+        }
+
+        .term-line { margin-bottom: 5px; word-wrap: break-word; }
+        .term-prompt { color: var(--neon-blue); margin-right: 10px; }
+        .term-output { color: #ccc; white-space: pre-wrap; margin-bottom: 15px; display: block; }
+        .term-error { color: var(--neon-pink); }
+        
+        #term-input-line { display: flex; }
+        #term-input {
+            background: transparent;
+            border: none;
+            color: var(--neon-green);
+            font-family: inherit;
+            font-size: inherit;
+            flex: 1;
+            outline: none;
+        }
+
+        /* --- HEADER / HERO SECTION --- */
+        header {
+            text-align: center;
+            padding: 80px 20px;
+            background: radial-gradient(circle at center, rgba(0, 243, 255, 0.1) 0%, transparent 70%);
+            border-bottom: 1px solid #333;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+        }
+
+        .role {
+            font-size: 1.2rem;
+            color: var(--neon-green);
+            margin-top: 10px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px var(--neon-green);
+        }
+
+        .contact-info {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .summary-box {
+            max-width: 800px;
+            margin: 30px auto 0;
+            padding: 20px;
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+            background: rgba(0,0,0,0.5);
+            border-radius: 8px;
+        }
+
+        /* --- SECTION TITLES --- */
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin: 60px 0 40px;
+            color: #fff;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--neon-pink);
+            display: inline-block;
+            padding-bottom: 10px;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            text-shadow: 0 0 8px var(--neon-pink);
+        }
+
+        /* --- SKILLS GRID --- */
+        .skills-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .skill-card {
+            background: var(--card-bg);
+            border: 1px solid #333;
+            padding: 20px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .skill-card:hover {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .skill-category {
+            color: var(--neon-blue);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        .skill-list {
+            margin: 0;
+            padding-left: 20px;
+            color: #ccc;
+        }
+        .skill-list li { margin-bottom: 5px; }
+
+        /* --- PROJECTS SECTION --- */
+        .projects-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border-left: 4px solid var(--neon-pink);
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .project-card:hover {
+            background: rgba(255, 0, 255, 0.05);
+        }
+
+        .project-title {
+            font-size: 1.3rem;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .project-date {
+            font-size: 0.8rem;
+            color: var(--neon-pink);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* --- TIMELINE SECTION --- */
+        .timeline {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 0;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background-color: #333;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .container {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+        }
+
+        .left { left: 0; }
+        .right { left: 50%; }
+
+        .container::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: var(--bg-color);
+            border: 3px solid var(--neon-blue);
+            top: 25px;
+            border-radius: 50%;
+            z-index: 1;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .right::after { left: -10px; }
+
+        .content {
+            padding: 20px 30px;
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .content:hover {
+            transform: scale(1.02);
+            border-color: var(--neon-blue);
+        }
+
+        .date-badge {
+            background: #222;
+            color: var(--neon-blue);
+            padding: 2px 8px;
+            border: 1px solid var(--neon-blue);
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        /* Responsive */
+        @media screen and (max-width: 600px) {
+            .timeline::after { left: 31px; }
+            .container { width: 100%; padding-left: 70px; padding-right: 25px; }
+            .container::after { left: 21px; }
+            .right { left: 0%; }
+            h1 { font-size: 2rem; }
+            #term-btn { top: 10px; left: 10px; padding: 5px 10px; font-size: 0.8rem; }
+            #terminal-window { width: 95%; height: 60%; }
+        }
+    </style>
+</head>
+<body>
+
+    <button id="term-btn">>_ TERMINAL MODE</button>
+
+    <div id="terminal-overlay">
+        <div id="terminal-window">
+            <div id="term-header">
+                <span>guest@abubakr-portfolio:~</span>
+                <span>bash</span>
+            </div>
+            <div id="term-body">
+                <div class="term-line">Welcome to Abubakr Mostafa's Interactive CV v1.0</div>
+                <div class="term-line">Type <span style="color:var(--neon-pink)">help</span> to see available commands.</div>
+                <br>
+                <div id="term-output-area"></div>
+                
+                <div id="term-input-line">
+                    <span class="term-prompt">guest@cv:~$</span>
+                    <input type="text" id="term-input" autocomplete="off" spellcheck="false" autofocus>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <h1>Abubakr Mostafa</h1>
+        <div class="role">SOC Analyst (L1/L2) | Threat Hunter</div>
+        
+        <div class="contact-info">
+            Makkah, Saudi Arabia | +966562271429<br>
+            <a href="mailto:abubakr.s.mostafa@gmail.com">abubakr.s.mostafa@gmail.com</a> | 
+            <a href="https://linkedin.com/in/abubakr-mostafa-32bb221a3">LinkedIn</a> | 
+            <a href="https://x.com/ocm_5">X.com</a>
+        </div>
+
+        <div class="summary-box">
+            SOC Analyst with hands-on experience in security monitoring, malware analysis, log correlation, and incident investigation. [cite_start]Experienced across L1 triage and L2 investigation workflows [cite: 5-6].
+        </div>
+    </header>
+
+    <h2 class="section-title">Technical Arsenal</h2>
+    <div class="skills-container">
+        <div class="skill-card">
+            <div class="skill-category">SIEM & Monitoring</div>
+            <ul class="skill-list">
+                <li>Splunk, Wazuh, Elastic</li>
+                <li>Alert Triage & Correlation</li>
+            </ul>
+        </div>
+        <div class="skill-card">
+            <div class="skill-category">Malware Analysis</div>
+            <ul class="skill-list">
+                <li>Static & Dynamic Analysis</li>
+                <li>IDA Pro & dnSpy</li>
+            </ul>
+        </div>
+        <div class="skill-card">
+            <div class="skill-category">Network Security</div>
+            <ul class="skill-list">
+                <li>Wireshark & PCAP Analysis</li>
+                <li>TCP/IP & Firewall Alerts</li>
+            </ul>
+        </div>
+        <div class="skill-card">
+            <div class="skill-category">DFIR</div>
+            <ul class="skill-list">
+                <li>Volatility, Autopsy, FTK</li>
+                <li>Memory & Disk Forensics</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2 class="section-title">Key Projects</h2>
+    <div class="projects-container">
+        <div class="project-card">
+            <div class="project-title">Automated Agentic RAG Threat Emulation Framework</div>
+            <span class="project-date">Graduation Project | Aug 2025 - Present</span>
+            [cite_start]<p>Designed an intelligence-driven threat emulation framework using Agentic AI and Retrieval-Augmented Generation (RAG)[cite: 26].</p>
+        </div>
+        <div class="project-card">
+            <div class="project-title">CTF Bootcamp Instructor</div>
+            <span class="project-date">Umm Al-Qura University | May 2024</span>
+            [cite_start]<p>Led the Cryptography section in a 5-day Capture The Flag bootcamp and created challenges[cite: 26].</p>
+        </div>
+    </div>
+
+    <h2 class="section-title">Career Timeline</h2>
+    <div class="timeline">
+        <div class="container left"><div class="content"><div class="date-badge">Sep 2025</div><h3>eCIRv2 Certified</h3><p>Incident Responder. [cite_start]Traffic analysis & mitigation[cite: 13].</p></div></div>
+        [cite_start]<div class="container right"><div class="content"><div class="date-badge">Aug 2025</div><h3>eCTHPv3 Certified</h3><p>Threat Hunting Professional[cite: 20].</p></div></div>
+        [cite_start]<div class="container left"><div class="content"><div class="date-badge">Apr-Jul 2025</div><h3>Cybersecurity Analyst (COOP)</h3><p>Analyzed 10+ malware samples & firewall alerts[cite: 18].</p></div></div>
+        [cite_start]<div class="container right"><div class="content"><div class="date-badge">Apr 2025</div><h3>eCPPT & eCDFPv2</h3><p>Double certification in Pentesting & Forensics[cite: 15, 23].</p></div></div>
+        [cite_start]<div class="container left"><div class="content"><div class="date-badge">Mar-Apr 2025</div><h3>GRC Specialist (COOP)</h3><p>Reviewed NCA ECC policies & compliance gaps[cite: 18].</p></div></div>
+        [cite_start]<div class="container right"><div class="content"><div class="date-badge">Jul-Nov 2024</div><h3>Cybersecurity Team Leader</h3><p>Led workshops and CTF challenges[cite: 18].</p></div></div>
+        [cite_start]<div class="container left"><div class="content"><div class="date-badge">Apr 2024</div><h3>eJPT Certified</h3><p>Junior Penetration Tester[cite: 22].</p></div></div>
+    </div>
+
+    <script>
+        // --- DATA STRUCTURE FOR FILE SYSTEM ---
+        const fileSystem = {
+            "about_me.txt": "Name: Abubakr Mostafa\nRole: SOC Analyst (L1/L2)\nLocation: Makkah, KSA\nStatus: Student @ Umm Al-Qura University (GPA 3.89/4)\nFocus: Blue Team, DFIR, Threat Hunting",
+            "contact.txt": "Email: abubakr.s.mostafa@gmail.com\nPhone: +966562271429\nLinkedIn: linkedin.com/in/abubakr-mostafa-32bb221a3",
+            "skills": {
+                "siem.txt": "- Splunk (Alert Triage, Correlation)\n- Wazuh\n- Elastic Stack",
+                "malware.txt": "- Static & Dynamic Analysis\n- IDA Pro\n- dnSpy\n- IOC Extraction",
+                "network.txt": "- Wireshark (PCAP Analysis)\n- TCP/IP\n- Firewall & IDS/IPS Log Analysis",
+                "forensics.txt": "- Volatility (Memory)\n- Autopsy (Disk)\n- FTK Imager"
+            },
+            "projects": {
+                "rag_framework.txt": "Project: Automated Agentic RAG Threat Emulation\nDate: Aug 2025 - Present\nDetails: Uses Agentic AI to prioritize MITRE ATT&CK techniques. Integrates Atomic Red Team for validation.",
+                "ctf_bootcamp.txt": "Project: CTF Bootcamp Instructor\nDate: May 2024\nDetails: Led Cryptography section. Designed challenges for university and high school students."
+            },
+            "experience": {
+                "coop_analyst.txt": "Role: Cybersecurity Analyst (COOP)\nOrg: Umm Al-Qura University\nTasks: Log analysis (Splunk), Malware RE (10+ samples), Threat Intel on Ransomware.",
+                "grc_specialist.txt": "Role: GRC Specialist (COOP)\nTasks: NCA ECC Policy review, Gap Analysis, Audit readiness.",
+                "club_leader.txt": "Role: Cybersecurity Team Leader\nTasks: Led workshops, CTF challenges, Public awareness sessions."
+            },
+            "certifications.txt": "- eCIRv2 (Incident Response)\n- eCTHPv3 (Threat Hunting)\n- eCPPT (Pentesting)\n- eCDFPv2 (Digital Forensics)\n- eJPT (Junior Pentesting)"
+        };
+
+        // --- TERMINAL STATE ---
+        let currentPath = []; 
+        let currentDir = fileSystem; 
+        
+        // --- DOM ELEMENTS ---
+        const termBtn = document.getElementById('term-btn');
+        const overlay = document.getElementById('terminal-overlay');
+        const input = document.getElementById('term-input');
+        const outputArea = document.getElementById('term-output-area');
+        const promptSpan = document.querySelector('.term-prompt');
+
+        // --- TOGGLE VISIBILITY ---
+        termBtn.addEventListener('click', () => {
+            overlay.style.display = 'flex';
+            input.focus();
+        });
+
+        // Close on outside click (optional)
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) overlay.style.display = 'none';
+        });
+
+        // --- INPUT HANDLING ---
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const command = input.value.trim();
+                input.value = '';
+                processCommand(command);
+            }
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                autoComplete();
+            }
+        });
+
+        function printToTerm(text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'term-output ' + className;
+            div.innerText = text;
+            outputArea.appendChild(div);
+            // Auto scroll to bottom
+            const body = document.getElementById('term-body');
+            body.scrollTop = body.scrollHeight;
+        }
+
+        function getPrompt() {
+            let pathStr = currentPath.length === 0 ? '~' : '~/' + currentPath.join('/');
+            return `guest@cv:${pathStr}$`;
+        }
+
+        function updatePrompt() {
+            promptSpan.innerText = getPrompt();
+        }
+
+        // --- COMMAND LOGIC ---
+        function processCommand(cmdRaw) {
+            // Print command history
+            const historyDiv = document.createElement('div');
+            historyDiv.innerHTML = `<span style="color:var(--neon-blue)">${getPrompt()}</span> ${cmdRaw}`;
+            outputArea.appendChild(historyDiv);
+
+            const args = cmdRaw.split(' ').filter(x => x);
+            const cmd = args[0];
+            const arg1 = args[1];
+
+            if (!cmd) return;
+
+            switch(cmd) {
+                case 'help':
+                    printToTerm("Available commands:\n  ls           List directory contents\n  cd [dir]     Change directory (use .. to go back)\n  cat [file]   Display file content\n  clear        Clear terminal screen\n  exit         Close terminal mode");
+                    break;
+                
+                case 'clear':
+                    outputArea.innerHTML = '';
+                    break;
+
+                case 'exit':
+                    overlay.style.display = 'none';
+                    break;
+
+                case 'ls':
+                    const items = Object.keys(currentDir).map(k => {
+                        return typeof currentDir[k] === 'object' ? k + '/' : k;
+                    });
+                    printToTerm(items.join('   '), 'term-output');
+                    break;
+
+                case 'cd':
+                    if (!arg1) {
+                        // Go home
+                        currentPath = [];
+                        currentDir = fileSystem;
+                    } else if (arg1 === '..') {
+                        // Go back
+                        if (currentPath.length > 0) {
+                            currentPath.pop();
+                            // Re-traverse from root
+                            let temp = fileSystem;
+                            for (let p of currentPath) {
+                                temp = temp[p];
+                            }
+                            currentDir = temp;
+                        }
+                    } else {
+                        // Go into dir
+                        // Handle trailing slash
+                        const target = arg1.replace(/\/$/, '');
+                        if (currentDir[target] && typeof currentDir[target] === 'object') {
+                            currentPath.push(target);
+                            currentDir = currentDir[target];
+                        } else {
+                            printToTerm(`bash: cd: ${arg1}: No such directory`, 'term-error');
+                        }
+                    }
+                    updatePrompt();
+                    break;
+
+                case 'cat':
+                    if (!arg1) {
+                        printToTerm("usage: cat [file]");
+                    } else {
+                        if (currentDir[arg1] && typeof currentDir[arg1] === 'string') {
+                            printToTerm(currentDir[arg1]);
+                        } else if (currentDir[arg1] && typeof currentDir[arg1] === 'object') {
+                            printToTerm(`cat: ${arg1}: Is a directory`, 'term-error');
+                        } else {
+                            printToTerm(`cat: ${arg1}: No such file`, 'term-error');
+                        }
+                    }
+                    break;
+
+                default:
+                    printToTerm(`bash: ${cmd}: command not found`, 'term-error');
+            }
+        }
+
+        function autoComplete() {
+            const val = input.value;
+            const args = val.split(' ');
+            const last = args[args.length - 1];
+            
+            const options = Object.keys(currentDir);
+            const match = options.find(o => o.startsWith(last));
+            
+            if (match) {
+                args[args.length - 1] = match;
+                input.value = args.join(' ');
+            }
+        }
+    </script>
+</body>
+</html>
